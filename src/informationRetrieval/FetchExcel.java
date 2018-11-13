@@ -3,7 +3,7 @@ package informationRetrieval;
 import screenDisplay.*;
 import dataStructure.*;
 
-public class FetchSAP {
+public class FetchExcel {
 	
 	private static Line[] lines = new Line[5];
 
@@ -18,7 +18,7 @@ public class FetchSAP {
 	}
 	
 	public static Line[] getLines() {
-		return FetchSAP.lines;
+		return FetchExcel.lines;
 	}
 
 }

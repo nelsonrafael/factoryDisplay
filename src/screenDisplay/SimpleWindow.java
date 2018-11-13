@@ -13,7 +13,6 @@ public class SimpleWindow {
 		//frame.setPreferredSize(new Dimension(1920, 1080));
 		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		frame.setUndecorated(true);
-		
 		frame.getContentPane().add(new SimplePanel());
 		
 		frame.setLocationRelativeTo(null);

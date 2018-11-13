@@ -10,7 +10,7 @@ import java.util.Calendar;
 import javax.swing.*;
 
 import dataStructure.*;
-import informationRetrieval.FetchSAP;
+import informationRetrieval.FetchExcel;
 
 @SuppressWarnings("serial")
 public class SimplePanel extends JPanel {
@@ -59,6 +59,8 @@ public class SimplePanel extends JPanel {
 
 	Color black = new Color(0, 0, 0);
 	Color red = new Color(255, 0, 0);
+	Color green = new Color(0, 255, 0);
+	Color blue = new Color(0, 0, 255);
 
 	public SimplePanel() {
 		
@@ -75,7 +77,6 @@ public class SimplePanel extends JPanel {
 		for (int i = 0; i < labels.length; i++) {
 			SimpleLabel l = new SimpleLabel(xPos[i], yPos[i], xSize[i], ySize[i]);
 			l.setBorder(black, borderSize);
-			l.setText(lines[i].getName(), red, font, fontSize);
 			labels[i] = l;
 			this.add(l);
 		}
@@ -109,7 +110,7 @@ public class SimplePanel extends JPanel {
 		        	lines[4] = l;
 		        	
 		        	for (int i = 0; i < labels.length; i++) {
-		        		labels[i].setText(lines[i].getName(), red, font, fontSize);
+		        		labels[i].setText(lines[i].get_descritivo(), black, font, fontSize);
 		        	}
 		        	
 		        }
@@ -129,7 +130,7 @@ public class SimplePanel extends JPanel {
 	}
 
 	void setLines() {
-		this.lines=FetchSAP.getLines();
+		this.lines=FetchExcel.getLines();
 		
 		/*
 		for(int i=0; i<lines.length; i++) {
