@@ -3,21 +3,24 @@ package screenDisplay;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import javax.swing.*;
 
 import dataStructure.*;
 import informationRetrieval.FetchSAP;
 
+@SuppressWarnings("serial")
 public class SimplePanel extends JPanel {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	
+	final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
 	private static final int TIME_COUNT_TOTAL = 300;
-	private static final int TIME_COUNT_ROTATIVE = 30;
+	private static final int TIME_COUNT_ROTATIVE = 5;
+	private static final int TIME_COUNT_UNIT = 1000;
+		
 	private Timer timer;
 	private int rotativeCount;
 	private int count;
@@ -25,16 +28,22 @@ public class SimplePanel extends JPanel {
 	private Line[] lines;
 	
 	SimpleLabel[] labels = new SimpleLabel[5];
+	SimpleLabel timeDateLabel;
+	
+	int timeDateX;
+	int timeDateY;
+	int timeDateWidth;
+	int timeDateHeight;
 
 	double width;
 	double height;
 
-	int onePerCent;
-	int twoPerCent;
-	int twentyTwoHalfPerCent;
-	int thirtyFourPerCent;
-	int sixtyThreePercent;
-	int ninetyOnePerCent;
+	int widthGap;
+	int heightGap;
+	int smallY;
+	int smallX;
+	int bigX;
+	int bigY;
 
 	int[] xPos = new int[5];
 	int[] yPos = new int[5];
@@ -44,6 +53,9 @@ public class SimplePanel extends JPanel {
 	String font = "Serif";
 	int fontSize = 40;
 	int borderSize = 12;
+	
+	String timeDateFont = "Monospace";
+	int timeDateFontSize = 60;
 
 	Color black = new Color(0, 0, 0);
 	Color red = new Color(255, 0, 0);
@@ -67,16 +79,24 @@ public class SimplePanel extends JPanel {
 			labels[i] = l;
 			this.add(l);
 		}
+		
+		timeDateLabel = new SimpleLabel(timeDateX, timeDateY, timeDateWidth, timeDateHeight);
+		this.add(timeDateLabel);
 
-		timer = new Timer(1000, new ActionListener() {
+		timer = new Timer(TIME_COUNT_UNIT, new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				
 				count++;
 				rotativeCount++;
 				
+				Calendar now = Calendar.getInstance();
+	            //System.out.println(dateFormat.format(now.getTime()));
+				timeDateLabel.setText(dateFormat.format(now.getTime()), black, timeDateFont, timeDateFontSize);
+				
 		        if (rotativeCount < TIME_COUNT_ROTATIVE) {
-		          System.out.println(rotativeCount);
+		          //System.out.println(rotativeCount);
 		        } else {
 		          //((Timer) (e.getSource())).stop();
 		        	rotativeCount=rotativeCount-TIME_COUNT_ROTATIVE;
@@ -120,43 +140,41 @@ public class SimplePanel extends JPanel {
 
 	void setPercentages() {
 
-		this.onePerCent = (int) (width / 100);
-		this.twoPerCent = (int) (height / 50);
-		this.twentyTwoHalfPerCent = (int) (height * 22.5 / 100);
-		this.thirtyFourPerCent = (int) (width * 34 / 100);
-		this.sixtyThreePercent = (int) (width * 63 / 100);
-		this.ninetyOnePerCent = (int) (height * 91 / 100);
+		this.widthGap = (int) (width * 3 / 200);
+		this.heightGap = (int) (height / 50);
+		this.smallY = (int) (height * 23 / 100);
+		this.smallX = (int) (width * 33 / 100);
+		this.bigX = (int) (width * 63 / 100);
+		this.bigY = (int) (height * 89 / 100);
 
-		/*
-		 * System.out.println(onePerCent); System.out.println(twoPerCent);
-		 * System.out.println(twentyTwoHalfPerCent);
-		 * System.out.println(thirtyFourPerCent); System.out.println(sixtyThreePercent);
-		 * System.out.println(ninetyOnePerCent);
-		 */
+		this.timeDateHeight = (int) (height * 6 / 100);
+		this.timeDateWidth = (int) (width / 2);
+		this.timeDateX = (int) (width / 5);
+		this.timeDateY = (int) (height * 23 / 25);
 	}
 
 	void setArrays() {
 
-		this.xPos[0] = this.onePerCent;
-		this.xPos[1] = this.onePerCent + this.sixtyThreePercent;
+		this.xPos[0] = this.widthGap;
+		this.xPos[1] = this.widthGap * 2 + this.bigX;
 		this.xPos[2] = this.xPos[1];
 		this.xPos[3] = this.xPos[1];
 		this.xPos[4] = this.xPos[1];
 
-		this.yPos[0] = this.twoPerCent;
-		this.yPos[1] = this.twoPerCent;
-		this.yPos[2] = this.twoPerCent * 2 + this.twentyTwoHalfPerCent;
-		this.yPos[3] = this.twoPerCent * 3 + this.twentyTwoHalfPerCent * 2;
-		this.yPos[4] = this.twoPerCent * 4 + this.twentyTwoHalfPerCent * 3;
+		this.yPos[0] = this.heightGap;
+		this.yPos[1] = this.heightGap;
+		this.yPos[2] = this.heightGap * 2 + this.smallY;
+		this.yPos[3] = this.heightGap * 3 + this.smallY * 2;
+		this.yPos[4] = this.heightGap * 4 + this.smallY * 3;
 
-		this.xSize[0] = this.sixtyThreePercent;
-		this.xSize[1] = this.thirtyFourPerCent;
+		this.xSize[0] = this.bigX;
+		this.xSize[1] = this.smallX;
 		this.xSize[2] = this.xSize[1];
 		this.xSize[3] = this.xSize[1];
 		this.xSize[4] = this.xSize[1];
 
-		this.ySize[0] = this.ninetyOnePerCent;
-		this.ySize[1] = this.twentyTwoHalfPerCent;
+		this.ySize[0] = this.bigY;
+		this.ySize[1] = this.smallY;
 		this.ySize[2] = ySize[1];
 		this.ySize[3] = ySize[1];
 		this.ySize[4] = ySize[1];

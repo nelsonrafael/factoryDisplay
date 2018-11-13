@@ -17,7 +17,7 @@ public class FetchSAP {
 		SimpleWindow.createWindow();
 	}
 	
-	public static Line[] getLines( ) {
+	public static Line[] getLines() {
 		return FetchSAP.lines;
 	}
 

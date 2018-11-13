@@ -5,12 +5,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
+@SuppressWarnings("serial")
 public class SimpleLabel extends JLabel{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	
 	private int x;
 	private int y;
