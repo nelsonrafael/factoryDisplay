@@ -9,11 +9,11 @@ public class CompareLineCode {
 	
 	public CompareLineCode(CSVReader reader) {
 		
-		linesToDisplay = new Line[Constants.lineCodesToDisplay.length];
+		linesToDisplay = new Line[Constants.LINE_CODES_TO_DISPLAY.length];
 		
-		for(int i=0; i<Constants.lineCodesToDisplay.length; i++) {
+		for(int i=0; i<Constants.LINE_CODES_TO_DISPLAY.length; i++) {
 			for(int j=0; j<reader.getLineList().size(); j++) {
-				if(Constants.lineCodesToDisplay[i]==reader.getLineList().get(j).get_cTrab()) {
+				if(Constants.LINE_CODES_TO_DISPLAY[i]==reader.getLineList().get(j).get_cTrab()) {
 					linesToDisplay[i]=reader.getLineList().get(j);
 				}
 			}
