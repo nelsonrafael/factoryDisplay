@@ -10,7 +10,6 @@ import java.util.Calendar;
 import javax.swing.*;
 
 import dataStructure.*;
-import informationRetrieval.FetchExcel;
 
 @SuppressWarnings("serial")
 public class SimplePanel extends JPanel {
@@ -25,8 +24,6 @@ public class SimplePanel extends JPanel {
 	private int rotativeCount;
 	private int count;
 
-	private Line[] lines;
-	
 	SimpleLabel[] labels = new SimpleLabel[5];
 	SimpleLabel timeDateLabel;
 	
@@ -62,9 +59,9 @@ public class SimplePanel extends JPanel {
 	Color green = new Color(0, 255, 0);
 	Color blue = new Color(0, 0, 255);
 
-	public SimplePanel() {
+	public SimplePanel(Line[] lines) {
 		
-		setLines();
+		setLines(lines);
 
 		setDimension();
 
@@ -129,8 +126,7 @@ public class SimplePanel extends JPanel {
 
 	}
 
-	void setLines() {
-		this.lines=FetchExcel.getLines();
+	void setLines(Line[] lines) {
 		
 		/*
 		for(int i=0; i<lines.length; i++) {

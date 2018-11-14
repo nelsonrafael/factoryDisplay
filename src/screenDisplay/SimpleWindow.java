@@ -2,18 +2,18 @@ package screenDisplay;
 
 import javax.swing.*;
 
+import dataStructure.Line;
 import misc.DragListener;
 
 public class SimpleWindow {
 	
-	public static void createWindow() {
+	public static void createWindow(Line[] lines) {
 		
 		JFrame frame = new JFrame("InitialWindow");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//frame.setPreferredSize(new Dimension(1920, 1080));
 		frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		frame.setUndecorated(true);
-		frame.getContentPane().add(new SimplePanel());
+		frame.getContentPane().add(new SimplePanel(lines));
 		
 		frame.setLocationRelativeTo(null);
 		frame.pack();
