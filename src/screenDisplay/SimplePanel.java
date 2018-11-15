@@ -3,21 +3,31 @@ package screenDisplay;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Calendar;
 
 import javax.swing.*;
-
 import dataStructure.*;
+import dataStructure.Shape;
+import informationRetrieval.CSVReader;
+import informationRetrieval.CompareLineCode;
 import misc.Constants;
 
 @SuppressWarnings("serial")
 public class SimplePanel extends JPanel {
 
+	CSVReader reader;
+
 	private Timer timer;
 	private int rotativeCount;
+	private int shiftCount;
 	private int count;
 
-	Line[] lines;
+	Line[][] lines;
+
+	Shape[] shapes = new Shape[5];
+	int[] shapeX = new int[5];
+	int[] shapeY = new int[5];
 
 	MainArea mainArea;
 
@@ -46,9 +56,9 @@ public class SimplePanel extends JPanel {
 	int[] xSize = new int[5];
 	int[] ySize = new int[5];
 
-	public SimplePanel(Line[] linesToDisplay) {
+	public SimplePanel() {
 
-		this.lines = linesToDisplay;
+		startReader();
 
 		setDimension();
 
@@ -66,6 +76,7 @@ public class SimplePanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 
 				count++;
+				shiftCount++;
 				rotativeCount++;
 
 				Calendar now = Calendar.getInstance();
@@ -73,6 +84,24 @@ public class SimplePanel extends JPanel {
 				timeDateLabel.setText(Constants.DATE_FORMAT.format(now.getTime()), Constants.COLOR_BLACK,
 						Constants.TIME_DATE_FONT, Constants.TIME_DATE_FONT_SIZE);
 
+				if (shiftCount < Constants.TIME_COUNT_SHIFT) {
+					// System.out.println(shiftCount);
+				} else {
+					// ((Timer) (e.getSource())).stop();
+					shiftCount = shiftCount - Constants.TIME_COUNT_SHIFT;
+
+					displayMainArea();
+
+					displaySecondaryArea();
+
+					setAndShowShapes();
+
+					repaint();
+					
+					changeShift();
+
+				}
+				
 				if (rotativeCount < Constants.TIME_COUNT_ROTATIVE) {
 					// System.out.println(rotativeCount);
 				} else {
@@ -81,23 +110,57 @@ public class SimplePanel extends JPanel {
 
 					changeOrder();
 
-					displayMainArea();
-
-					displaySecondaryArea();
-
 				}
-
+				
 				if (count < Constants.TIME_COUNT_TOTAL) {
 					// System.out.println(count);
 				} else {
 					// ((Timer) (e.getSource())).stop();
 					count = count - Constants.TIME_COUNT_TOTAL;
-					// TODO
+
+					startReader();
 				}
+
 			}
 		});
 		timer.setInitialDelay(0);
 		timer.start();
+
+	}
+
+	void startReader() {
+		try {
+			reader = new CSVReader(Constants.FILE_PATH);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		CompareLineCode compare = new CompareLineCode(reader);
+
+		this.lines = compare.getLinesToDisplay();
+	}
+
+	void setAndShowShapes() {
+		
+		for (int i = 0; i < 5; i++) {
+			shapes[i] = new Square(shapeX[i], shapeY[i], Constants.HUNDRED_VAR, Constants.HUNDRED_VAR);
+			String state;
+			if(i==0) {
+				state = lines[0][0].get_status();
+			}
+			else state  = lines[i][3].get_status();
+			if (state.equals("Em PRODUÇÃO"))
+				shapes[i].setColor(Constants.COLOR_GREEN);
+			else if (state.equals("PARADO"))
+				shapes[i].setColor(Constants.COLOR_YELLOW);
+			else if (state.equals("IMPRODUTIVO"))
+				shapes[i].setColor(Constants.COLOR_RED);
+			else if (state.equals("SETUP"))
+				shapes[i].setColor(Constants.COLOR_BLUE);
+			else if (state.equals("REWORKS"))
+				shapes[i].setColor(Constants.COLOR_CYAN);
+		}
 
 	}
 
@@ -128,10 +191,11 @@ public class SimplePanel extends JPanel {
 				this.add(secondaryArea[i].getName(j));
 			}
 		}
+
 	}
 
 	void changeOrder() {
-		Line l = lines[0];
+		Line[] l = lines[0];
 		lines[0] = lines[1];
 		lines[1] = lines[2];
 		lines[2] = lines[3];
@@ -139,32 +203,40 @@ public class SimplePanel extends JPanel {
 		lines[4] = l;
 	}
 
+	void changeShift() {
+		Line l = lines[0][0];
+		lines[0][0] = lines[0][1];
+		lines[0][1] = lines[0][2];
+		lines[0][2] = lines[0][3];
+		lines[0][3] = l;
+	}
+
 	void displayMainArea() {
 
 		String[] mainInfoToDisplay = new String[Constants.MAIN_AREA_NUMBER_OF_LABELS];
 
-		mainInfoToDisplay[0] = lines[0].get_descritivo();
-		mainInfoToDisplay[1] = String.valueOf(lines[0].get_qtProd());
-		mainInfoToDisplay[2] = String.valueOf(lines[0].get_qtRwk());
-		mainInfoToDisplay[3] = String.valueOf(lines[0].get_objHora());
-		mainInfoToDisplay[4] = String.valueOf(lines[0].get_realHora());
-		mainInfoToDisplay[5] = String.valueOf(lines[0].get_tTot());
-		mainInfoToDisplay[6] = String.valueOf(lines[0].get_tAbert());
-		mainInfoToDisplay[7] = String.valueOf(lines[0].get_tA());
-		mainInfoToDisplay[8] = String.valueOf(lines[0].get_tProd());
-		mainInfoToDisplay[9] = String.valueOf(lines[0].get_tP());
-		mainInfoToDisplay[10] = String.valueOf(lines[0].get_tUtil());
-		mainInfoToDisplay[11] = String.valueOf(lines[0].get_tU());
-		mainInfoToDisplay[12] = lines[0].get_status();
+		mainInfoToDisplay[0] = lines[0][0].get_descritivo();
+		mainInfoToDisplay[1] = lines[0][0].get_turno();
+		mainInfoToDisplay[2] = String.valueOf(lines[0][0].get_qtProd());
+		mainInfoToDisplay[3] = String.valueOf(lines[0][0].get_qtRwk());
+		mainInfoToDisplay[4] = String.valueOf(lines[0][0].get_objHora());
+		mainInfoToDisplay[5] = String.valueOf(lines[0][0].get_realHora());
+		mainInfoToDisplay[6] = String.valueOf(lines[0][0].get_tTot());
+		mainInfoToDisplay[7] = String.valueOf(lines[0][0].get_tAbert());
+		mainInfoToDisplay[8] = String.valueOf(lines[0][0].get_tA());
+		mainInfoToDisplay[9] = String.valueOf(lines[0][0].get_tProd());
+		mainInfoToDisplay[10] = String.valueOf(lines[0][0].get_tP());
+		mainInfoToDisplay[11] = String.valueOf(lines[0][0].get_tUtil());
+		mainInfoToDisplay[12] = String.valueOf(lines[0][0].get_tU());
 
-		mainArea.getLabel(0).setText(mainInfoToDisplay[0], Constants.COLOR_BLACK, Constants.MAIN_FONT,
-				Constants.MAIN_FONT_SIZE);
+		mainArea.getLabel(0).setText(mainInfoToDisplay[0], Constants.COLOR_BLACK, Constants.TITLE_FONT,
+				Constants.TITLE_FONT_SIZE);
 
 		for (int i = 1; i < Constants.MAIN_AREA_NUMBER_OF_LABELS; i++) {
 			mainArea.getLabel(i).setText(mainInfoToDisplay[i], Constants.COLOR_BLACK, Constants.MAIN_FONT,
-					Constants.SECONDARY_FONT_SIZE);
+					Constants.MAIN_FONT_SIZE);
 		}
-		
+
 		for (int i = 0; i < Constants.MAIN_AREA_NAMES.length; i++) {
 			mainArea.getName(i).setText(Constants.MAIN_AREA_NAMES[i], Constants.COLOR_GREY, Constants.MAIN_FONT,
 					Constants.SECONDARY_FONT_SIZE);
@@ -176,25 +248,25 @@ public class SimplePanel extends JPanel {
 
 		String[][] secondaryInfoToDisplay = new String[4][Constants.SECONDARY_AREA_NUMBER_OF_LABELS];
 
-		for (int i=0; i<4; i++) {
-			secondaryInfoToDisplay[i][0] = lines[i+1].get_descritivo();
-			secondaryInfoToDisplay[i][1] = String.valueOf(lines[i+1].get_qtProd());
-			secondaryInfoToDisplay[i][2] = String.valueOf(lines[i+1].get_objHora());
-			secondaryInfoToDisplay[i][3] = String.valueOf(lines[i+1].get_realHora());
-			secondaryInfoToDisplay[i][4] = String.valueOf(lines[i+1].get_tP());
-			secondaryInfoToDisplay[i][5] = lines[i+1].get_status();
+		for (int i = 0; i < 4; i++) {
+			secondaryInfoToDisplay[i][0] = lines[i + 1][3].get_descritivo();
+			secondaryInfoToDisplay[i][1] = String.valueOf(lines[i + 1][3].get_qtProd());
+			secondaryInfoToDisplay[i][2] = String.valueOf(lines[i + 1][3].get_objHora());
+			secondaryInfoToDisplay[i][3] = String.valueOf(lines[i + 1][3].get_realHora());
+			secondaryInfoToDisplay[i][4] = String.valueOf(lines[i + 1][3].get_tP());
+			secondaryInfoToDisplay[i][5] = lines[i + 1][3].get_status();
 		}
-		
-		for (int i=0; i<secondaryArea.length; i++) {
-			secondaryArea[i].getLabel(0).setText(secondaryInfoToDisplay[i][0], Constants.COLOR_BLACK, Constants.SECONDARY_FONT,
-					Constants.SECONDARY_FONT_SIZE);
-			for (int j=1; j<Constants.SECONDARY_AREA_NUMBER_OF_LABELS; j++) {
-				secondaryArea[i].getLabel(j).setText(secondaryInfoToDisplay[i][j], Constants.COLOR_BLACK, Constants.AUXILIARY_FONT,
-						Constants.SECONDARY_FONT_SIZE);
+
+		for (int i = 0; i < secondaryArea.length; i++) {
+			secondaryArea[i].getLabel(0).setText(secondaryInfoToDisplay[i][0], Constants.COLOR_BLACK,
+					Constants.SECONDARY_FONT, Constants.SECONDARY_FONT_SIZE);
+			for (int j = 1; j < Constants.SECONDARY_AREA_NUMBER_OF_LABELS; j++) {
+				secondaryArea[i].getLabel(j).setText(secondaryInfoToDisplay[i][j], Constants.COLOR_BLACK,
+						Constants.AUXILIARY_FONT, Constants.SECONDARY_FONT_SIZE);
 			}
-			for (int j = 0; j < Constants.SECONDARY_AREA_NAMES.length-1; j++) {
-				secondaryArea[i].getName(j).setText(Constants.SECONDARY_AREA_NAMES[j], Constants.COLOR_GREY, Constants.AUXILIARY_FONT,
-						Constants.AUXILIARY_FONT_SIZE);
+			for (int j = 0; j < Constants.SECONDARY_AREA_NAMES.length - 1; j++) {
+				secondaryArea[i].getName(j).setText(Constants.SECONDARY_AREA_NAMES[j], Constants.COLOR_GREY,
+						Constants.AUXILIARY_FONT, Constants.AUXILIARY_FONT_SIZE);
 			}
 		}
 
@@ -240,6 +312,19 @@ public class SimplePanel extends JPanel {
 		this.ySize[2] = ySize[1];
 		this.ySize[3] = ySize[1];
 		this.ySize[4] = ySize[1];
+
+		this.shapeX[0] = this.bigX - Constants.HUNDRED_VAR - Constants.SHAPE_ADJUSTER * 5;
+		this.shapeX[1] = (int) (this.width - Constants.HUNDRED_VAR - Constants.SHAPE_ADJUSTER);
+		this.shapeX[2] = shapeX[1];
+		this.shapeX[3] = shapeX[1];
+		this.shapeX[4] = shapeX[1];
+
+		this.shapeY[0] = Constants.BORDER_SIZE + Constants.SECONDARY_AREA_LABEL_SIZE_Y;
+		this.shapeY[1] = shapeY[0] - Constants.BORDER_SIZE * 3;
+		this.shapeY[2] = shapeY[1] + smallY - Constants.BORDER_SIZE;
+		this.shapeY[3] = shapeY[2] + smallY - Constants.BORDER_SIZE;
+		this.shapeY[4] = shapeY[3] + smallY - Constants.BORDER_SIZE;
+
 	}
 
 	void setDimension() {
@@ -251,6 +336,14 @@ public class SimplePanel extends JPanel {
 		/*
 		 * System.out.println(width); System.out.println(height);
 		 */
+	}
+
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		for (int i = 0; i < shapes.length; i++) {
+			if (shapes[i] != null)
+				shapes[i].draw(g);
+		}
 	}
 
 }
