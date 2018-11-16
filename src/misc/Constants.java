@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 
 public class Constants {
 
-	public static final String FILE_PATH = "C:\\Users\\NelsonMartins\\Desktop\\export2.csv";
+	public static final String FILE_PATH = "\\\\vicaim02\\Download\\factoryDisplayFile\\linesToDisplay.csv";
 	
 	public static final int[] LINE_CODES_TO_DISPLAY = { 50010, 50030, 50050, 50060, 50190 };
 	
@@ -61,6 +61,6 @@ public class Constants {
 	public static final Color COLOR_ORANGE = new Color(255, 140, 0);
 	public static final Color COLOR_GREY = new Color(96, 96, 96);
 	public static final Color COLOR_CYAN = new Color(0, 255, 255);
-	public static final Color COLOR_WHITE = new Color(0, 255, 255);
+	public static final Color COLOR_WHITE = new Color(255, 255, 255);
 
 }

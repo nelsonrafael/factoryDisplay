@@ -36,7 +36,7 @@ public class SimpleLabel extends JLabel {
 	public int getHeight() {
 		return this.height;
 	}
-
+	
 	public void setBorder(Color c, int size) {
 		Border labelBorder = new LineBorder(c, size);
 		this.setBorder(labelBorder);

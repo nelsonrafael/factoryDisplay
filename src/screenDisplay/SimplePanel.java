@@ -28,6 +28,9 @@ public class SimplePanel extends JPanel {
 	Shape[] shapes = new Shape[5];
 	int[] shapeX = new int[5];
 	int[] shapeY = new int[5];
+	
+	int[] newShapeW = new int[5];
+	int[] newShapeH = new int[5];
 
 	MainArea mainArea;
 
@@ -145,6 +148,7 @@ public class SimplePanel extends JPanel {
 		
 		for (int i = 0; i < 5; i++) {
 			shapes[i] = new Square(shapeX[i], shapeY[i], Constants.HUNDRED_VAR, Constants.HUNDRED_VAR);
+			//shapes[i] = new Square(xPos[i], yPos[i], newShapeW[i], newShapeH[i]);
 			String state;
 			if(i==0) {
 				state = lines[0][0].get_status();
@@ -324,6 +328,18 @@ public class SimplePanel extends JPanel {
 		this.shapeY[2] = shapeY[1] + smallY - Constants.BORDER_SIZE;
 		this.shapeY[3] = shapeY[2] + smallY - Constants.BORDER_SIZE;
 		this.shapeY[4] = shapeY[3] + smallY - Constants.BORDER_SIZE;
+		
+		this.newShapeW[0] = bigX;
+		this.newShapeW[1] = smallX;
+		this.newShapeW[2] = smallX;
+		this.newShapeW[3] = smallX;
+		this.newShapeW[4] = smallX;
+		
+		this.newShapeH[0] = bigY;
+		this.newShapeH[1] = smallY;
+		this.newShapeH[2] = smallY;
+		this.newShapeH[3] = smallY;
+		this.newShapeH[4] = smallY;
 
 	}
 
