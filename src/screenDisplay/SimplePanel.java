@@ -3,9 +3,12 @@ package screenDisplay;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import dataStructure.*;
 import dataStructure.Shape;
@@ -18,6 +21,10 @@ public class SimplePanel extends JPanel {
 
 	CSVReader reader;
 
+	private BufferedImage logoVicaima;
+	
+	int logoX, logoY;
+
 	private Timer timer;
 	private int rotativeCount;
 	private int shiftCount;
@@ -28,7 +35,7 @@ public class SimplePanel extends JPanel {
 	Shape[] shapes = new Shape[5];
 	int[] shapeX = new int[5];
 	int[] shapeY = new int[5];
-	
+
 	int[] newShapeW = new int[5];
 	int[] newShapeH = new int[5];
 
@@ -38,6 +45,7 @@ public class SimplePanel extends JPanel {
 
 	SimpleLabel[] labels = new SimpleLabel[5];
 	SimpleLabel timeDateLabel;
+	Shape timeDateShape;
 
 	int timeDateX;
 	int timeDateY;
@@ -73,6 +81,8 @@ public class SimplePanel extends JPanel {
 
 		createMainLabels();
 
+		loadLogo();
+
 		timer = new Timer(Constants.TIME_COUNT_UNIT, new ActionListener() {
 
 			@Override
@@ -100,11 +110,11 @@ public class SimplePanel extends JPanel {
 					setAndShowShapes();
 
 					repaint();
-					
+
 					changeShift();
 
 				}
-				
+
 				if (rotativeCount < Constants.TIME_COUNT_ROTATIVE) {
 					// System.out.println(rotativeCount);
 				} else {
@@ -114,7 +124,7 @@ public class SimplePanel extends JPanel {
 					changeOrder();
 
 				}
-				
+
 				if (count < Constants.TIME_COUNT_TOTAL) {
 					// System.out.println(count);
 				} else {
@@ -131,6 +141,14 @@ public class SimplePanel extends JPanel {
 
 	}
 
+	void loadLogo() {
+		try {
+			logoVicaima = ImageIO.read(new File("resources/logo.png"));
+		} catch (IOException ex) {
+			// handle exception...
+		}
+	}
+
 	void startReader() {
 		try {
 			reader = new CSVReader(Constants.FILE_PATH);
@@ -145,15 +163,16 @@ public class SimplePanel extends JPanel {
 	}
 
 	void setAndShowShapes() {
-		
+
 		for (int i = 0; i < 5; i++) {
-			shapes[i] = new Square(shapeX[i], shapeY[i], Constants.HUNDRED_VAR, Constants.HUNDRED_VAR);
-			//shapes[i] = new Square(xPos[i], yPos[i], newShapeW[i], newShapeH[i]);
+			// shapes[i] = new Square(shapeX[i], shapeY[i], Constants.HUNDRED_VAR,
+			// Constants.HUNDRED_VAR);
+			shapes[i] = new Square(xPos[i], yPos[i], newShapeW[i], newShapeH[i]);
 			String state;
-			if(i==0) {
+			if (i == 0) {
 				state = lines[0][0].get_status();
-			}
-			else state  = lines[i][3].get_status();
+			} else
+				state = lines[i][3].get_status();
 			if (state.equals("Em PRODUÇÃO"))
 				shapes[i].setColor(Constants.COLOR_GREEN);
 			else if (state.equals("PARADO"))
@@ -176,6 +195,8 @@ public class SimplePanel extends JPanel {
 			this.add(l);
 		}
 		timeDateLabel = new SimpleLabel(timeDateX, timeDateY, timeDateWidth, timeDateHeight);
+		timeDateShape = new Square(0, bigY, bigX, (int) (height - bigY));
+		timeDateShape.setColor(Constants.COLOR_WHITE);
 		this.add(timeDateLabel);
 		this.mainArea = new MainArea(bigX, bigY);
 		for (int i = 0; i < mainArea.getLabels().length; i++) {
@@ -287,7 +308,7 @@ public class SimplePanel extends JPanel {
 
 		this.timeDateHeight = (int) (height * 6 / 100);
 		this.timeDateWidth = (int) (width / 2);
-		this.timeDateX = (int) (width / 6);
+		this.timeDateX = (int) (width / 3 - Constants.SECONDARY_AREA_LABEL_SIZE_Y);
 		this.timeDateY = (int) (height * 23 / 25);
 	}
 
@@ -328,18 +349,21 @@ public class SimplePanel extends JPanel {
 		this.shapeY[2] = shapeY[1] + smallY - Constants.BORDER_SIZE;
 		this.shapeY[3] = shapeY[2] + smallY - Constants.BORDER_SIZE;
 		this.shapeY[4] = shapeY[3] + smallY - Constants.BORDER_SIZE;
-		
+
 		this.newShapeW[0] = bigX;
 		this.newShapeW[1] = smallX;
 		this.newShapeW[2] = smallX;
 		this.newShapeW[3] = smallX;
 		this.newShapeW[4] = smallX;
-		
+
 		this.newShapeH[0] = bigY;
 		this.newShapeH[1] = smallY;
 		this.newShapeH[2] = smallY;
 		this.newShapeH[3] = smallY;
 		this.newShapeH[4] = smallY;
+		
+		this.logoX = Constants.BORDER_SIZE * 4;
+		this.logoY = this.bigY + 10;
 
 	}
 
@@ -356,6 +380,8 @@ public class SimplePanel extends JPanel {
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		timeDateShape.draw(g);
+		g.drawImage(logoVicaima, logoX, logoY, this);
 		for (int i = 0; i < shapes.length; i++) {
 			if (shapes[i] != null)
 				shapes[i].draw(g);
