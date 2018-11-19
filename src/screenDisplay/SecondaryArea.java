@@ -1,21 +1,26 @@
 package screenDisplay;
 
+import dataStructure.Shape;
+import dataStructure.Square;
 import misc.Constants;
 
 public class SecondaryArea {
 	
-	double width, height, gapX, gapY;	
-	int xCoords[], yCoords[];
-	SimpleLabel[] labels;
-	SimpleLabel[] names;
+	private double width, height, gapX, gapY;	
+	private int xCoords[], yCoords[];
+	private SimpleLabel[] labels, names;
+	private Shape top, bottom;
 	
-	public SecondaryArea(double width, double height, double gapX, double gapY) {
+	public SecondaryArea(double width, double height, double gapX, double gapY, int[] topShape, int[] bottomShape) {
 		this.width = width;
 		this.height = height;
 		this.gapX = gapX;
 		this.gapY = gapY;
 		this.labels = new SimpleLabel[Constants.SECONDARY_AREA_NUMBER_OF_LABELS];
-		this.names = new SimpleLabel[Constants.SECONDARY_AREA_NAMES.length];
+		this.names = new SimpleLabel[Constants.SECONDARY_AREA_NUMBER_OF_NAMES];
+		this.top = new Square(topShape[0], topShape[1], topShape[2], topShape[3]);
+		this.bottom = new Square(bottomShape[0], bottomShape[1], bottomShape[2], bottomShape[3]);
+		this.bottom.setColor(Constants.COLOR_WHITE);
 		generateCoords();
 		generateLabels();
 	}
@@ -67,6 +72,14 @@ public class SecondaryArea {
 	
 	public SimpleLabel[] getNames() {
 		return this.names;
+	}
+	
+	public Shape getTopShape() {
+		return this.top;
+	}
+	
+	public Shape getBottomShape() {
+		return this.bottom;
 	}
 	
 }
