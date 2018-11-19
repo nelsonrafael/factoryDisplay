@@ -67,6 +67,7 @@ public class CSVReader {
 			}
 			index = 0;
 			lineNumber++;
+			l.set_dif(l.get_realHora()-l.get_objHora());
 			lineList.add(l);
 		}
 		reader.close();

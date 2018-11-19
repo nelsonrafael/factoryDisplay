@@ -22,7 +22,7 @@ public class SimplePanel extends JPanel {
 	CSVReader reader;
 
 	private BufferedImage logoVicaima;
-	
+
 	int logoX, logoY;
 
 	private Timer timer;
@@ -32,12 +32,10 @@ public class SimplePanel extends JPanel {
 
 	Line[][] lines;
 
-	Shape[] shapes = new Shape[5];
-	int[] shapeX = new int[5];
-	int[] shapeY = new int[5];
-
-	int[] newShapeW = new int[5];
-	int[] newShapeH = new int[5];
+	int[] mainAreaSquareTop = new int[4];
+	int[] mainAreaSquareBottom = new int[4];
+	int[][] secondaryAreaSquareTop = new int[4][4];
+	int[][] secondaryAreaSquareBottom = new int[4][4];
 
 	MainArea mainArea;
 
@@ -167,22 +165,42 @@ public class SimplePanel extends JPanel {
 		for (int i = 0; i < 5; i++) {
 			// shapes[i] = new Square(shapeX[i], shapeY[i], Constants.HUNDRED_VAR,
 			// Constants.HUNDRED_VAR);
-			shapes[i] = new Square(xPos[i], yPos[i], newShapeW[i], newShapeH[i]);
 			String state;
 			if (i == 0) {
 				state = lines[0][0].get_status();
 			} else
 				state = lines[i][3].get_status();
-			if (state.equals("Em PRODUÇÃO"))
-				shapes[i].setColor(Constants.COLOR_GREEN);
-			else if (state.equals("PARADO"))
-				shapes[i].setColor(Constants.COLOR_YELLOW);
-			else if (state.equals("IMPRODUTIVO"))
-				shapes[i].setColor(Constants.COLOR_RED);
-			else if (state.equals("SETUP"))
-				shapes[i].setColor(Constants.COLOR_BLUE);
-			else if (state.equals("REWORKS"))
-				shapes[i].setColor(Constants.COLOR_CYAN);
+			if (state.equals("Em PRODUÇÃO")) {
+				if (i == 0) {
+					mainArea.getTopShape().setColor(Constants.COLOR_GREEN);
+				} else {
+					secondaryArea[i - 1].getTopShape().setColor(Constants.COLOR_GREEN);
+				}
+			} else if (state.equals("PARADO")) {
+				if (i == 0) {
+					mainArea.getTopShape().setColor(Constants.COLOR_YELLOW);
+				} else {
+					secondaryArea[i - 1].getTopShape().setColor(Constants.COLOR_YELLOW);
+				}
+			} else if (state.equals("IMPRODUTIVO")) {
+				if (i == 0) {
+					mainArea.getTopShape().setColor(Constants.COLOR_RED);
+				} else {
+					secondaryArea[i - 1].getTopShape().setColor(Constants.COLOR_RED);
+				}
+			} else if (state.equals("SETUP")) {
+				if (i == 0) {
+					mainArea.getTopShape().setColor(Constants.COLOR_BLUE);
+				} else {
+					secondaryArea[i - 1].getTopShape().setColor(Constants.COLOR_BLUE);
+				}
+			} else if (state.equals("REWORKS")) {
+				if (i == 0) {
+					mainArea.getTopShape().setColor(Constants.COLOR_CYAN);
+				} else {
+					secondaryArea[i - 1].getTopShape().setColor(Constants.COLOR_CYAN);
+				}
+			}
 		}
 
 	}
@@ -190,7 +208,7 @@ public class SimplePanel extends JPanel {
 	void createMainLabels() {
 		for (int i = 0; i < labels.length; i++) {
 			SimpleLabel l = new SimpleLabel(xPos[i], yPos[i], xSize[i], ySize[i]);
-			l.setBorder(Constants.COLOR_BLACK, Constants.BORDER_SIZE);
+			l.setBorder(Constants.COLOR_DARK_GREY, Constants.BORDER_SIZE);
 			labels[i] = l;
 			this.add(l);
 		}
@@ -198,7 +216,7 @@ public class SimplePanel extends JPanel {
 		timeDateShape = new Square(0, bigY, bigX, (int) (height - bigY));
 		timeDateShape.setColor(Constants.COLOR_WHITE);
 		this.add(timeDateLabel);
-		this.mainArea = new MainArea(bigX, bigY);
+		this.mainArea = new MainArea(bigX, bigY, mainAreaSquareTop, mainAreaSquareBottom);
 		for (int i = 0; i < mainArea.getLabels().length; i++) {
 			this.add(mainArea.getLabel(i));
 		}
@@ -208,7 +226,8 @@ public class SimplePanel extends JPanel {
 		this.secondaryArea = new SecondaryArea[4];
 		for (int i = 0; i < secondaryArea.length; i++) {
 			double tempY = i * smallY - Constants.BORDER_SIZE * i;
-			this.secondaryArea[i] = new SecondaryArea(smallX, smallY, bigX, tempY);
+			this.secondaryArea[i] = new SecondaryArea(smallX, smallY, bigX, tempY, secondaryAreaSquareTop[i],
+					secondaryAreaSquareBottom[i]);
 			for (int j = 0; j < secondaryArea[i].getLabels().length; j++) {
 				this.add(secondaryArea[i].getLabel(j));
 			}
@@ -242,17 +261,13 @@ public class SimplePanel extends JPanel {
 
 		mainInfoToDisplay[0] = lines[0][0].get_descritivo();
 		mainInfoToDisplay[1] = lines[0][0].get_turno();
-		mainInfoToDisplay[2] = String.valueOf(lines[0][0].get_qtProd());
-		mainInfoToDisplay[3] = String.valueOf(lines[0][0].get_qtRwk());
-		mainInfoToDisplay[4] = String.valueOf(lines[0][0].get_objHora());
-		mainInfoToDisplay[5] = String.valueOf(lines[0][0].get_realHora());
-		mainInfoToDisplay[6] = String.valueOf(lines[0][0].get_tTot());
-		mainInfoToDisplay[7] = String.valueOf(lines[0][0].get_tAbert());
-		mainInfoToDisplay[8] = String.valueOf(lines[0][0].get_tA());
-		mainInfoToDisplay[9] = String.valueOf(lines[0][0].get_tProd());
-		mainInfoToDisplay[10] = String.valueOf(lines[0][0].get_tP());
-		mainInfoToDisplay[11] = String.valueOf(lines[0][0].get_tUtil());
-		mainInfoToDisplay[12] = String.valueOf(lines[0][0].get_tU());
+		mainInfoToDisplay[2] = lines[0][0].get_status();
+		mainInfoToDisplay[3] = String.valueOf(lines[0][0].get_realHora());
+		mainInfoToDisplay[4] = String.valueOf(lines[0][0].get_dif());
+		mainInfoToDisplay[5] = String.valueOf(lines[0][0].get_qtProd()) + '(' + String.valueOf(lines[0][0].get_qtRwk()) + ')';
+		mainInfoToDisplay[6] = String.valueOf(lines[0][0].get_tA());
+		mainInfoToDisplay[7] = String.valueOf(lines[0][0].get_tP());
+		mainInfoToDisplay[8] = String.valueOf(lines[0][0].get_tU());
 
 		mainArea.getLabel(0).setText(mainInfoToDisplay[0], Constants.COLOR_BLACK, Constants.TITLE_FONT,
 				Constants.TITLE_FONT_SIZE);
@@ -263,7 +278,7 @@ public class SimplePanel extends JPanel {
 		}
 
 		for (int i = 0; i < Constants.MAIN_AREA_NAMES.length; i++) {
-			mainArea.getName(i).setText(Constants.MAIN_AREA_NAMES[i], Constants.COLOR_GREY, Constants.MAIN_FONT,
+			mainArea.getName(i).setText(Constants.MAIN_AREA_NAMES[i], Constants.COLOR_GREY, Constants.SECONDARY_FONT,
 					Constants.SECONDARY_FONT_SIZE);
 		}
 
@@ -275,11 +290,11 @@ public class SimplePanel extends JPanel {
 
 		for (int i = 0; i < 4; i++) {
 			secondaryInfoToDisplay[i][0] = lines[i + 1][3].get_descritivo();
-			secondaryInfoToDisplay[i][1] = String.valueOf(lines[i + 1][3].get_qtProd());
-			secondaryInfoToDisplay[i][2] = String.valueOf(lines[i + 1][3].get_objHora());
-			secondaryInfoToDisplay[i][3] = String.valueOf(lines[i + 1][3].get_realHora());
-			secondaryInfoToDisplay[i][4] = String.valueOf(lines[i + 1][3].get_tP());
-			secondaryInfoToDisplay[i][5] = lines[i + 1][3].get_status();
+			secondaryInfoToDisplay[i][1] = lines[i + 1][3].get_status();
+			secondaryInfoToDisplay[i][2] = String.valueOf(lines[i + 1][3].get_realHora());
+			secondaryInfoToDisplay[i][3] = String.valueOf(lines[i + 1][3].get_dif());
+			secondaryInfoToDisplay[i][4] = String.valueOf(lines[i + 1][3].get_qtProd());
+			
 		}
 
 		for (int i = 0; i < secondaryArea.length; i++) {
@@ -338,53 +353,47 @@ public class SimplePanel extends JPanel {
 		this.ySize[3] = ySize[1];
 		this.ySize[4] = ySize[1];
 
-		this.shapeX[0] = this.bigX - Constants.HUNDRED_VAR - Constants.SHAPE_ADJUSTER * 5;
-		this.shapeX[1] = (int) (this.width - Constants.HUNDRED_VAR - Constants.SHAPE_ADJUSTER);
-		this.shapeX[2] = shapeX[1];
-		this.shapeX[3] = shapeX[1];
-		this.shapeX[4] = shapeX[1];
+		this.mainAreaSquareTop[0] = this.xPos[0];
+		this.mainAreaSquareTop[1] = this.yPos[0];
+		this.mainAreaSquareTop[2] = bigX;
+		this.mainAreaSquareTop[3] = smallY;
 
-		this.shapeY[0] = Constants.BORDER_SIZE + Constants.SECONDARY_AREA_LABEL_SIZE_Y;
-		this.shapeY[1] = shapeY[0] - Constants.BORDER_SIZE * 3;
-		this.shapeY[2] = shapeY[1] + smallY - Constants.BORDER_SIZE;
-		this.shapeY[3] = shapeY[2] + smallY - Constants.BORDER_SIZE;
-		this.shapeY[4] = shapeY[3] + smallY - Constants.BORDER_SIZE;
+		this.mainAreaSquareBottom[0] = this.xPos[0];
+		this.mainAreaSquareBottom[1] = this.yPos[0] + smallY;
+		this.mainAreaSquareBottom[2] = bigX;
+		this.mainAreaSquareBottom[3] = bigY - smallY;
 
-		this.newShapeW[0] = bigX;
-		this.newShapeW[1] = smallX;
-		this.newShapeW[2] = smallX;
-		this.newShapeW[3] = smallX;
-		this.newShapeW[4] = smallX;
+		for (int i = 0; i < 4; i++) {
+			this.secondaryAreaSquareTop[i][0] = this.xPos[1];
+			this.secondaryAreaSquareBottom[i][0] = this.xPos[1];
+			this.secondaryAreaSquareTop[i][1] = this.yPos[i + 1];
+			this.secondaryAreaSquareBottom[i][1] = this.yPos[i + 1] + smallY / 2;
+			this.secondaryAreaSquareTop[i][2] = smallX;
+			this.secondaryAreaSquareBottom[i][2] = smallX;
+			this.secondaryAreaSquareTop[i][3] = smallY / 2;
+			this.secondaryAreaSquareBottom[i][3] = smallY / 2;
+		}
 
-		this.newShapeH[0] = bigY;
-		this.newShapeH[1] = smallY;
-		this.newShapeH[2] = smallY;
-		this.newShapeH[3] = smallY;
-		this.newShapeH[4] = smallY;
-		
 		this.logoX = Constants.BORDER_SIZE * 4;
 		this.logoY = this.bigY + 10;
 
 	}
 
 	void setDimension() {
-
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		this.width = screenSize.getWidth();
 		this.height = screenSize.getHeight();
-
-		/*
-		 * System.out.println(width); System.out.println(height);
-		 */
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		timeDateShape.draw(g);
 		g.drawImage(logoVicaima, logoX, logoY, this);
-		for (int i = 0; i < shapes.length; i++) {
-			if (shapes[i] != null)
-				shapes[i].draw(g);
+		mainArea.getTopShape().draw(g);
+		mainArea.getBottomShape().draw(g);
+		for (int i = 0; i < secondaryArea.length; i++) {
+			secondaryArea[i].getTopShape().draw(g);
+			secondaryArea[i].getBottomShape().draw(g);
 		}
 	}
 

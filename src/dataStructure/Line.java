@@ -19,6 +19,7 @@ public class Line {
 	private int tU;
 	private String traffic;
 	private String status;
+	private double dif;
 	
 	public Line() {
 		
@@ -157,6 +158,14 @@ public class Line {
 	
 	public void set_status(String s) {
 		this.status = s;
+	}
+	
+	public double get_dif() {
+		return this.dif;
+	}
+	
+	public void set_dif(double n) {
+		this.dif = n;
 	}
 	
 }
